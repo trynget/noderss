@@ -4,21 +4,18 @@ var superagent = require('superagent'); //这三个外部依赖不要忘记npm i
 var cheerio = require('cheerio');
 var eventproxy = require('eventproxy');
 var iconv = require('iconv-lite');//文字转码库
-var targetUrl = 'http://news.baidu.com/n?cmd=4&class=nba&tn=rss';
-superagent.get(targetUrl)
+var request = require('superagent-charset');
+var targetUrl = 'http://news.baidu.com/n?cmd=4&class=sportnews&tn=rss';
+var targetEncoding = 'gb2312';
+request.get(targetUrl)
+    .charset(targetEncoding)
     .end(function (err, res) {
 		   if (err) {
             return console.error(err);
         }
         var topicUrls = [];
-        var chunks = [];
-        res.on('data', function(chunk) {
-            chunks.push(chunk);
-        });
-        res.on('output', function() {
-            var decodedBody = iconv.decode(Buffer.concat(chunks), 'gb2312');
-            console.log(decodedBody);
-        });
+        console.log(res.charset);
+
          var $ = cheerio.load(res.text,{decodeEntities: false,xmlMode: true});
         // 获取首页所有的链接
          $('item','channel').each(function (idx, element) {
